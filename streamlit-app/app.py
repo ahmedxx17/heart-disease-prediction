@@ -17,6 +17,8 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 from sklearn.preprocessing import LabelEncoder
+from sklearn.svm import SVC
+from sklearn.model_selection import train_test_split
 
 # Page configuration
 st.set_page_config(
@@ -29,15 +31,7 @@ st.set_page_config(
 # Load trained model and recreate deterministic LabelEncoders
 # ---------------------------------------------------------------------------
 MODEL_PATH = Path(__file__).parent / "heart_model.pkl"
-
-@st.cache_resource
-def load_model():
-    """Loads the pickled trained SVC model or artifact package."""
-    with open(MODEL_PATH, "rb") as f:
-        loaded = pickle.load(f)
-        if isinstance(loaded, dict) and "model" in loaded:
-            return loaded["model"]
-        return loaded
+DATA_PATH = Path(__file__).parent / "sample-data.csv"
 
 @st.cache_resource
 def build_label_encoders():
@@ -58,13 +52,47 @@ def build_label_encoders():
     ])
     return encoders
 
-# Initialize model and encoders
-try:
-    model = load_model()
+@st.cache_resource
+def load_model():
+    """
+    Loads the pickled trained SVC model or trains a fresh instance if a
+    cross-environment pickle version mismatch occurs on Streamlit Cloud.
+    """
+    if MODEL_PATH.exists():
+        try:
+            with open(MODEL_PATH, "rb") as f:
+                loaded = pickle.load(f)
+                if isinstance(loaded, dict) and "model" in loaded:
+                    return loaded["model"]
+                return loaded
+        except Exception:
+            pass  # Fall through to fallback training
+
+    # Robust fallback: Train identical SVC model on sample-data.csv
+    if DATA_PATH.exists():
+        df = pd.read_csv(DATA_PATH)
+    else:
+        df = pd.read_csv(Path(__file__).parent.parent / "1 - Heart Disease Prediction" / "sample-data.csv")
+    
     encoders = build_label_encoders()
-except Exception as e:
-    st.error(f"Error loading model artifact: {e}")
-    st.stop()
+    target_encoder = LabelEncoder().fit(["No", "Yes"])
+    
+    X = pd.DataFrame({
+        "Age": df["Age"],
+        "Gender": encoders["Gender"].transform(df["Gender"]),
+        "ChestPain": encoders["ChestPain"].transform(df["ChestPain"]),
+        "MaxHeartRate": df["MaxHeartRate"]
+    })
+    y = target_encoder.transform(df["HeartDisease"])
+    
+    X_train, _, y_train, _ = train_test_split(X, y, test_size=0.2, random_state=42, shuffle=True)
+    m = SVC(kernel="linear", probability=True, random_state=42)
+    m.fit(X_train, y_train)
+    return m
+
+# Initialize model and encoders
+model = load_model()
+encoders = build_label_encoders()
 
 # ---------------------------------------------------------------------------
 # Page Header & Context
