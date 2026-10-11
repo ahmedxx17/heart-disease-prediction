@@ -1,0 +1,39 @@
+================================================================================
+COMSATS UNIVERSITY ISLAMABAD
+Course: AIC354 – Machine Learning
+Assignment: Heart Disease Prediction System (Converted from Titanic ML Series)
+Student Roll Number: FA24-BSE-175
+================================================================================
+
+1. GITHUB REPOSITORY LINK:
+   https://github.com/ahmedxx17/heart-disease-prediction
+
+2. LIVE STREAMLIT DEMO LINK:
+   https://heart-disease-prediction-ahmedxx17.streamlit.app
+
+================================================================================
+SUBMISSION DELIVERABLES INCLUDED:
+================================================================================
+1. Heart_Disease_Prediction.ipynb  - Complete Jupyter Notebook (Runs top-to-bottom with 0 errors)
+2. Heart_Disease_Prediction.pdf    - Exported PDF report of the complete executed notebook
+3. sample-data.csv                 - Preprocessed UCI Cleveland dataset (4 selected features + target)
+4. processed.cleveland.data        - Raw 14-attribute benchmark dataset from UCI repository
+5. heart_model.pkl                 - Serialized trained Support Vector Classifier (Linear SVC)
+6. app.py                          - Deployed Streamlit Web Application code
+7. requirements.txt                - Pinned dependency specifications
+8. README.md                       - Complete technical documentation and viva defense notes
+
+================================================================================
+KEY MODEL & ARCHITECTURE SUMMARY:
+================================================================================
+- Dataset: UCI Cleveland Heart Disease (303 records)
+- Constraint: Exactly 4 input features
+    1. Age (Numerical)
+    2. Gender (Categorical: Male, Female)
+    3. Chest Pain Type (Categorical: Typical Angina, Atypical Angina, Non-Anginal, Asymptomatic)
+    4. Maximum Heart Rate Achieved (Numerical)
+- Algorithm: Support Vector Classifier (SVC with Linear Kernel & Platt Probability Scaling)
+- Held-out Test Split: 80% Train (242 instances), 20% Test (61 instances)
+- Accuracy on Test Split: ~75.4% (46/61 correct)
+- Precision: 0.78 | Recall: 0.64 | F1-Score: 0.76
+================================================================================
